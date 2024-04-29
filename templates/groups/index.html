@@ -1,0 +1,107 @@
+{{define "groups/index.html" }}
+ 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广播系统生成excel系统</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" >
+    <script src="/static/js/bootstrap.bundle.js" ></script>
+   </head>
+<body>
+   
+    <div class="container">
+        <div class="row">
+            <div class="col" style="padding-top: 15px;">
+                <h2>分组设置（根据铃声系统来设定）</h2> 
+                <p style="padding-top: 10px;">今天是：{{.tt}}</p>
+            </div>
+            <div class="col-5"></div>
+            <div class="col"></div>
+
+        </div>
+    </div>
+    <!--  导航-->
+    <div class="container">
+        <ul class="nav">
+            <li class="nav-item">
+              <a class="nav-link active" href="/">首页</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/compute">计算JobData</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/cfangan">方案表</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/alltask">铃声任务</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/groups/">铃声区域--组</a>
+              </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">铃声区域--终端</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled">歌曲路径</a>
+            </li>
+          </ul>
+    </div>
+    <!--导航结束 -->
+    <div class="container" style="padding-top: 20px;">
+        <div class="row">
+          <div class="col">
+            <div class="alert alert-info" role="alert">
+              铃声组的列表
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    <div class="container" style="padding-top: 20px;">
+      <div class="row">
+        <div class="col-6">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">铃声分组名</th>
+                    <th scope="col">分组的值</th>
+                     
+                    
+                    <th scope="col">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{range .groups}}
+                  <tr>
+                    <td scope="col">#</td>
+                    <td scope="col">{{.Id}}</td>
+                    <td scope="col">{{.Groupname}}</td>
+                    <td scope="col">{{.Val}}</td>
+                     
+                    
+                    <td scope="col"><a href=" /groups/mod/{{.Id}}">修改</a>  <a href="/groups/del/{{.Id}}">删除</a>
+                     
+                  </tr>
+                  {{end}}
+                </tbody>
+              </table>
+        </div>
+        <div class="col">
+
+        </div>
+        
+      </div>
+    </div>
+</body>
+</html>
+
+ 
+
+
+
+{{end}}
