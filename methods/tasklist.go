@@ -72,8 +72,11 @@ func (t *Tlist) Createlist(c *gin.Context) {
 	id, _ := c.Params.Get("id")
 	// 查找所有的铃声模板
 	var al []models.Alltask
+
+	var gp []models.Groups
+	data.Find(&gp)
 	//data.Find(&al)
-	c.HTML(200, "tasklist/createpage.html", gin.H{"tt": arr[0], "msg": msg, "id": id, "alllings": al})
+	c.HTML(200, "tasklist/createpage.html", gin.H{"tt": arr[0], "msg": msg, "id": id, "alllings": al, "groups": gp})
 }
 
 func (t *Tlist) Changelb(c *gin.Context) {
