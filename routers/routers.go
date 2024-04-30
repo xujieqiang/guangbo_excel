@@ -57,9 +57,12 @@ func Newrouter() *gin.Engine {
 		api.GET("/tasklist/:id", tasklist.Index)
 		api.GET("/tasklist/modpage/:id/:listid", tasklist.Modlist)
 		api.GET("/tasklist/create/:id", tasklist.Createlist)
+		api.GET("/tasklist/createerr/:id/:msg", tasklist.Createlist)
+
 		api.GET("/tasklist/del/:id/:listid", tasklist.Dellist)
 		api.GET("/tasklist/delerr/:id/:msg", tasklist.Index)
 		api.GET("/tasklist/clb/:tag", tasklist.Changelb)
+		api.POST("/tasklist/subcreate/", tasklist.Subcreate)
 
 		/**********************************************************
 		alltask模块部分的问题

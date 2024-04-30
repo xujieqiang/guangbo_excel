@@ -75,3 +75,12 @@ type Tasklist struct {
 func (t *Tasklist) TableName() string {
 	return "tasklist"
 }
+
+type Setting struct {
+	Id   int
+	Dayd string
+}
+
+func (s *Setting) TableName() string {
+	return "setting"
+}

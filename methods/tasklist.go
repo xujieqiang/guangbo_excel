@@ -14,6 +14,9 @@ import (
 )
 
 type Tlist struct{}
+type Grr struct {
+	Xiaozu []string `form:"gsp[]"`
+}
 
 func NewTlist() Tlist {
 	return Tlist{}
@@ -43,11 +46,13 @@ func (t *Tlist) Index(c *gin.Context) {
 		c.Redirect(301, "/")
 		return
 	}
+	var fa models.Fangan
+	data.Where("id=?", iid).Find(&fa)
 	// 获取tasklist
 	var tl []models.Tasklist
 	data.Where("FanganId=?", iid).Order("starttime").Find(&tl)
 
-	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg})
+	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg, "fanganname": fa.Listname})
 }
 
 func (t *Tlist) Modlist(c *gin.Context) {
@@ -93,7 +98,75 @@ func (t *Tlist) Changelb(c *gin.Context) {
 	}
 	c.JSON(200, string(j))
 }
+func (t *Tlist) Subcreate(c *gin.Context) {
+	fanganid := c.PostForm("fanganid")
+	listname := c.PostForm("listname")
+	tag := c.PostForm("leibie")
+	lingstemp := c.PostForm("lingstemp") //获取的是alltask的id
+	starttime := c.PostForm("starttime")
+	jobdata := c.PostForm("jobdata")
+	repeatnum := c.PostForm("repeatnum")
+	playmode := c.PostForm("playmode")
+	var g Grr
+	c.ShouldBind(&g)
 
+	gup := ""
+	for _, vv := range g.Xiaozu {
+		gup += vv
+	}
+	fmt.Println("========>", gup)
+	var tl models.Tasklist
+	fid, _ := strconv.Atoi(fanganid)
+	tl.Fanganid = fid
+	if listname == "" {
+		msg := "listname 是空的，请检查！"
+		c.Redirect(302, "/tasklist/createerr/"+fanganid+"/"+msg)
+		return
+	}
+	tl.Name = listname
+	ts, _ := strconv.Atoi(tag)
+	fmt.Println(ts)
+	// 从alltask 模板中获取相关数据
+	var lt models.Alltask
+	lings, _ := strconv.Atoi(lingstemp)
+	data.Where("id=?", lings).Find(&lt)
+	tl.Taskid = lt.Id
+	tl.Jobtype = lt.Jobtype
+	tl.Jobmask = lt.Jobmask
+	tl.Medias = lt.Medias
+	var year models.Setting
+	data.Where("id=?", 1).Find(&year)
+	y := year.Dayd
+	tl.Starttime = y + " " + starttime
+	tl.Stoptime = y
+	jd, _ := strconv.Atoi(jobdata)
+	fmt.Println("============<<<<>>>>>>", jd)
+	if jd != 65663 {
+		msg := "jobdata 错误，请检查！"
+		c.Redirect(302, "/tasklist/createerr/"+fanganid+"/"+msg)
+		return
+	}
+	tl.Jobdata = jd
+	rp, _ := strconv.Atoi(repeatnum)
+	if rp >= 3 {
+		msg := "repeatnum重复次数是否过多，请检查！"
+		c.Redirect(302, "/tasklist/createerr/"+fanganid+"/"+msg)
+		return
+	}
+	tl.Repeatnum = rp
+	pm, _ := strconv.Atoi(playmode)
+	if pm != 0 {
+		msg := "playmod设置错误，可能被禁用，请检查！"
+		c.Redirect(302, "/tasklist/createerr/"+fanganid+"/"+msg)
+		return
+	}
+	tl.Playmode = pm
+	tl.Groups = gup
+	fmt.Println(tl)
+	data.Create(&tl)
+	c.Redirect(302, "/tasklist/"+fanganid)
+
+}
 func (t *Tlist) Dellist(c *gin.Context) {
 	id, e := c.Params.Get("id")
 	if !e {

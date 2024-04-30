@@ -45,8 +45,8 @@
     <div class="container" style="padding-top: 20px;">
       <div class="row">
         <div class="col">
-            <form action="#" method="post">
-                 
+            <form action="/tasklist/subcreate" method="post">
+                <input type="hidden" name="fanganid" value="{{.id}}" >
                 <div class="form-group">
                   <label for=" ">铃声任务名 </label>
                   <input type="text" class="form-control" id="fangan" name="listname" value="" required aria-describedby="emailHelp">
@@ -83,7 +83,7 @@
                 </div>
                 <div class="form-group">
                   <label for=" ">JobData</label><br>
-                  <input type="text" class="form-control"  value="65663" name="jobdata" disabled>
+                  <input type="text" class="form-control"  value="65663" name="jobdata" >
                   <!-- <input type="checkbox" value="1" name="jd" id="cc" >1&nbsp;&nbsp;
                   <input type="checkbox" value="2" name="jd" >2&nbsp;&nbsp;
                   <input type="checkbox" value="3" name="jd">3&nbsp;&nbsp;
@@ -107,16 +107,13 @@
                 <div class="form-group">
                   <label for=" ">Groups(播放区域)</label><br>
                   
-                    {{range .groups}}
-                    
+                    {{range .groups}}                    
                     <input type="checkbox" name="gsp[]" value="{{.Val}}" >
-                    {{.Groupname}}
-                    <br>
-                    
-                    {{end}}
-                  
-                   
+                    <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                    <br>                    
+                    {{end}}                  
                 </div>
+                
                 <!-- <div class="form-group form-check">
                   <input type="checkbox" class="form-check-input" id="exampleCheck1">
                   <label class="form-check-label" for="exampleCheck1">Check me out</label>
