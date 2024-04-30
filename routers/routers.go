@@ -55,6 +55,10 @@ func Newrouter() *gin.Engine {
 		************************************************************/
 		/// tasklist 表的操作
 		api.GET("/tasklist/:id", tasklist.Index)
+		api.GET("/tasklist/modpage/:id/:listid", tasklist.Modlist)
+		api.GET("/tasklist/create/:id", tasklist.Createlist)
+		api.GET("/tasklist/del/:id/:listid", tasklist.Dellist)
+		api.GET("/tasklist/delerr/:id/:msg", tasklist.Index)
 
 		/**********************************************************
 		alltask模块部分的问题

@@ -23,6 +23,7 @@
         </div>
     </div>
     <!--  导航-->
+
     <div class="container">
         <ul class="nav">
             <li class="nav-item">
@@ -49,6 +50,21 @@
           </ul>
     </div>
     <!--导航结束 -->
+    <div class="container" style="padding-top: 20px;">
+      <div class="row">
+        <div class="col">
+          <div class="alert alert-info" role="alert">
+            最终生成的铃声列表
+          </div>
+          {{if .msg}}
+          <div class="alert alert-danger" role="alert">
+            {{.msg}}
+          </div>
+          {{end}}
+        </div>
+
+      </div>
+    </div>
     <div class="container" style="padding-top: 20px;">
       <div class="row">
         <div class="col">
@@ -99,7 +115,7 @@
               
               <td scope="col">{{.Groups}}</td>
              
-              <td scope="col">修改  删除</td>
+              <td scope="col"><a href="/tasklist/modpage/{{.isd}}/{{.Id}}">修改</a> <a href="/tasklist/del/{{.isd}}/{{.Id}}"> 删除</a></td>
             </tr>
             {{end}}
           </tbody>
