@@ -1,15 +1,5 @@
 {{ define "tasklist/modpage.html"}}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>广播系统生成excel系统</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" >
-    <script src="/static/js/bootstrap.bundle.js" ></script>
-   </head>
-<body>
+{{template "common/header.html"}}
    
     <div class="container">
         <div class="row">
@@ -23,37 +13,12 @@
         </div>
     </div>
     <!--  导航-->
-    
-    <div class="container">
-        <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link active" href="/">首页</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/compute">计算JobData</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/cfangan">方案表</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/alltask">铃声任务</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/groups">铃声区域--组</a>
-              </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">铃声区域--终端</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled">歌曲路径</a>
-            </li>
-          </ul>
-    </div>
+    {{template "common/navbar.html"}}
     <!--导航结束 -->
     <div class="container" style="padding-top: 20px;">
         <div class="row">
           <div class="col">
-            <a href="/groups/"><h5>返回铃声分组列表</h5></a>
+            <a href="/tasklist/{{.id}}"><h5>返回铃声生成的列表</h5></a>
           </div>
           <div class="col-6"></div><div class="col"></div>
         </div>
@@ -63,15 +28,16 @@
       <div class="row">
         <div class="col">
             <form action="/groups/submod" method="post">
-                <input type="hidden" value="{{.onegroup.Id}}" name="id" >
+                <input type="hidden" value="{{.onelist.Id}}" name="listid" >
+                <input type="hidden" value="{{.onelist.Fanganid}}" name="fid" >
                 <div class="form-group">
-                  <label for=" ">铃声分组名(GroupName)</label>
-                  <input type="text" class="form-control" id="fangan" name="groupname" value="{{.onegroup.Groupname}}" required aria-describedby="emailHelp">
+                  <label for=" ">铃声任务名(GroupName)</label>
+                  <input type="text" class="form-control" id="fangan" name="listname" value="{{.onelist.Name}}" required aria-describedby="emailHelp">
                   <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 <div class="form-group">
-                    <label for=" ">分组的值（1;2;3;....）</label>
-                    <input type="text" class="form-control" id="fangan" name="val" required value="{{.onegroup.Val}}" aria-describedby="emailHelp">
+                    <label for=" ">Jobtype</label>
+                    <input type="text" class="form-control" id="fangan" name="jobtype" required value="{{.onelist.Jobtype}}" aria-describedby="emailHelp">
                     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 

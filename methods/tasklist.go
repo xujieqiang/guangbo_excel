@@ -1,6 +1,7 @@
 package methods
 
 import (
+	"encoding/json"
 	"fmt"
 	"gexcel/db"
 	"gexcel/models"
@@ -46,19 +47,48 @@ func (t *Tlist) Index(c *gin.Context) {
 	var tl []models.Tasklist
 	data.Where("FanganId=?", iid).Order("starttime").Find(&tl)
 
-	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "isd": iid, "msg": msg})
+	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg})
 }
 
 func (t *Tlist) Modlist(c *gin.Context) {
 	dd := time.Now().String()
 	arr := strings.Split(dd, " ")
-	c.HTML(200, "tasklist/modpage.html", gin.H{"tt": arr[0]})
+	id, _ := c.Params.Get("id")
+	listid, _ := c.Params.Get("listid")
+	var tl models.Tasklist
+	lid, _ := strconv.Atoi(listid)
+	data.Where("id=?", lid).Find(&tl)
+
+	c.HTML(200, "tasklist/modpage.html", gin.H{"tt": arr[0], "id": id, "onelist": tl})
 }
 
 func (t *Tlist) Createlist(c *gin.Context) {
 	dd := time.Now().String()
 	arr := strings.Split(dd, " ")
-	c.HTML(200, "tasklist/createpage.html", gin.H{"tt": arr[0]})
+	msg, e := c.Params.Get("msg")
+	if !e {
+		msg = ""
+	}
+	id, _ := c.Params.Get("id")
+	// 查找所有的铃声模板
+	var al []models.Alltask
+	//data.Find(&al)
+	c.HTML(200, "tasklist/createpage.html", gin.H{"tt": arr[0], "msg": msg, "id": id, "alllings": al})
+}
+
+func (t *Tlist) Changelb(c *gin.Context) {
+
+	tag, _ := c.Params.Get("tag")
+	fmt.Println("==========>", tag)
+
+	all := []models.Alltask{}
+	data.Where("tag=?", tag).Find(&all)
+	j, err := json.Marshal(all)
+	if err != nil {
+		c.Redirect(302, "/")
+		return
+	}
+	c.JSON(200, string(j))
 }
 
 func (t *Tlist) Dellist(c *gin.Context) {

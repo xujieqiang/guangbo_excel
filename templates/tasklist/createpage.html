@@ -1,15 +1,6 @@
 {{ define "tasklist/createpage.html"}}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>广播系统生成excel系统</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" >
-    <script src="/static/js/bootstrap.bundle.js" ></script>
-   </head>
-<body>
+{{template "common/header.html"}}
    
     <div class="container">
         <div class="row">
@@ -22,38 +13,30 @@
 
         </div>
     </div>
+
     <!--  导航-->
     
-    <div class="container">
-        <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link active" href="/">首页</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/compute">计算JobData</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/cfangan">方案表</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/alltask">铃声任务</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/groups">铃声区域--组</a>
-              </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">铃声区域--终端</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled">歌曲路径</a>
-            </li>
-          </ul>
-    </div>
+    {{template "common/navbar.html"}}
     <!--导航结束 -->
+    <div class="container" style="padding-top: 20px;">
+      <div class="row">
+        <div class="col">
+          <div class="alert alert-info" role="alert">
+            创建新的铃声任务
+          </div>
+          {{if .msg}}
+          <div class="alert alert-danger" role="alert">
+            {{.msg}}
+          </div>
+          {{end}}
+        </div>
+
+      </div>
+    </div>
     <div class="container" style="padding-top: 20px;">
         <div class="row">
           <div class="col">
-            <a href="/groups/"><h5>返回铃声分组列表</h5></a>
+            <a href="/tasklist/{{.id}}"><h5>返回生成的铃声任务列表</h5></a>
           </div>
           <div class="col-6"></div><div class="col"></div>
         </div>
@@ -62,19 +45,55 @@
     <div class="container" style="padding-top: 20px;">
       <div class="row">
         <div class="col">
-            <form action="/groups/submod" method="post">
-                <input type="hidden" value="{{.onegroup.Id}}" name="id" >
+            <form action="#" method="post">
+                 
                 <div class="form-group">
-                  <label for=" ">铃声分组名(GroupName)</label>
-                  <input type="text" class="form-control" id="fangan" name="groupname" value="{{.onegroup.Groupname}}" required aria-describedby="emailHelp">
+                  <label for=" ">铃声任务名 </label>
+                  <input type="text" class="form-control" id="fangan" name="listname" value="" required aria-describedby="emailHelp">
                   <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 <div class="form-group">
-                    <label for=" ">分组的值（1;2;3;....）</label>
-                    <input type="text" class="form-control" id="fangan" name="val" required value="{{.onegroup.Val}}" aria-describedby="emailHelp">
+                  <label for=" ">铃声类别(alltask)</label><br>
+                  <select class="form-select" name="leibie" id="lb" onchange="calllings()">
+                    <option value="" selected > 请选择铃声类别</option>                     
+                    <option value="1">日常铃声</option>
+                    <option value="0">特殊铃声</option>
+                    <option value="2">考试铃声</option>
+                    
+                  </select>
+                  <br>
+                  <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                </div>
+                <div class="form-group">
+                  <label for=" ">铃声模板(alltask)</label>
+                  <div id="list">
+                    <select name="lingstemp" >
+                      <option value="">请选择铃声模板</option>
+
+                    </select>
+                  </div> 
+                  
+                
+                  <br>
+                  <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                </div>
+                <div class="form-group">
+                    <label for=" ">铃声启动时间(09:09:09)</label>
+                    <input type="text" class="form-control" id="fangan" name="starttime" required value="" placeholder="00:00:00" aria-describedby="emailHelp">
                     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
-                
+                <div class="form-group">
+                  <label for=" ">JobData</label><br>
+                  <input type="checkbox" value="1" name="jd" id="cc" >1&nbsp;&nbsp;
+                  <input type="checkbox" value="2" name="jd" >2&nbsp;&nbsp;
+                  <input type="checkbox" value="3" name="jd">3&nbsp;&nbsp;
+                  <input type="checkbox" value="4" name="jd">4&nbsp;&nbsp;
+                  <input type="checkbox" value="5" name="jd">5&nbsp;&nbsp;
+                  <input type="checkbox" value="6" name="jd">6&nbsp;&nbsp;
+                  <input type="checkbox" value="7" name="jd">7&nbsp;&nbsp;
+                  <input type="checkbox" value="8" name="jdall" onchange="checkall()">全选
+                  <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                </div>
                 <!-- <div class="form-group form-check">
                   <input type="checkbox" class="form-check-input" id="exampleCheck1">
                   <label class="form-check-label" for="exampleCheck1">Check me out</label>
@@ -84,10 +103,46 @@
                 </div>                
               </form>
         </div>
-        <div class="col-4" ></div> <div class="col"></div>
+        <div class="col-1" ></div> <div class="col"></div>
         
       </div>
     </div>
+    <script >
+      function calllings() {
+        var selv=document.getElementById("lb").value;
+        console.log(selv)
+        $.ajax({
+          url:"/tasklist/clb/"+selv,
+          type:"GET",
+          success:function(res){
+            // console.log(res);
+            var rsstr="<select class=\"form-select\" name=\"lingstemp\">"
+            rsstr=rsstr+"<option value=\"\" selected> 请选择铃声模板</option>"
+            data=JSON.parse(res);
+            
+            var i=0
+            for( i=0;i<data.length;i++){
+              console.log(data[i]);
+              rsstr=rsstr+"<option value=\""+data[i].Id+"\">"+data[i].Taskname + "</option>";
+            }
+            rsstr=rsstr+"</select>";
+            console.log(rsstr);
+            var listtemp=document.getElementById("list");
+            listtemp.innerHTML=rsstr;            
+          }
+
+        })
+      }
+      function checkall(){
+        let checkarr=$('input[name="jd"]')
+        
+        for(let i=0;i<checkarr.length;i++){
+          
+          checkarr[i].setAttribute("checked",true);
+          
+        }
+      }
+    </script>
 </body>
 </html>
 
