@@ -52,6 +52,15 @@ func (t *Tlist) Index(c *gin.Context) {
 	// 获取tasklist
 	var tl []models.Tasklist
 	data.Where("FanganId=?", iid).Order("starttime").Find(&tl)
+	for i, val := range tl {
+		s := val.Starttime
+		sarr := strings.Split(s, " ")
+
+		tl[i].Starttime = sarr[1]
+		music := val.Medias
+		marr := strings.Split(music, "\\")
+		tl[i].Medias = marr[len(marr)-1]
+	}
 
 	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg, "fanganname": fa.Listname})
 }
