@@ -3,6 +3,7 @@ package methods
 import (
 	"fmt"
 	"gexcel/models"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -29,11 +30,28 @@ func (a *Alllings) Index(c *gin.Context) {
 
 	var al []models.Alltask
 	data.Where("tag=?", 1).Find(&al)
+	for i, val := range al {
+		_, err := os.Stat(val.Medias)
+		if err != nil {
+			al[i].Medias = "==>>路径错误，无法读取！"
+		}
+	}
 	var sal []models.Alltask
 	data.Where("tag=?", 0).Find(&sal)
+	for i, val := range sal {
+		_, err := os.Stat(val.Medias)
+		if err != nil {
+			sal[i].Medias = "==>>路径错误，无法读取！"
+		}
+	}
 	var kaoshi []models.Alltask
 	data.Where("tag=?", 2).Find(&kaoshi)
-
+	for i, val := range kaoshi {
+		_, err := os.Stat(val.Medias)
+		if err != nil {
+			kaoshi[i].Medias = "==>>路径错误，无法读取！"
+		}
+	}
 	c.HTML(200, "alltask/index.html", gin.H{"tt": arr[0], "alllings": al, "spe": sal, "kaoshi": kaoshi})
 }
 
