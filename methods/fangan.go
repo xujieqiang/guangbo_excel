@@ -33,7 +33,7 @@ func (f *FF) Index(c *gin.Context) {
 	}
 	// 获取tasklist
 	var fa []models.Fangan
-	data.Order("createtime").Find(&fa)
+	data.Order("createtime desc").Find(&fa)
 
 	c.HTML(200, "index/index.html", gin.H{"tt": arr[0], "fangan": fa, "msg": msg})
 }
@@ -74,7 +74,10 @@ func (f *FF) CFangan(c *gin.Context) {
 	if !e {
 		msg = ""
 	}
-	c.HTML(200, "index/cfangan.html", gin.H{"tt": arr[0], "msg": msg})
+	var fa []models.Fangan
+	data.Where("fatherfa=?", 1).Find(&fa)
+
+	c.HTML(200, "index/cfangan.html", gin.H{"tt": arr[0], "msg": msg, "fangan": fa})
 }
 func (f *FF) Subcreate(c *gin.Context) {
 	// dd := time.Now().String()
@@ -94,6 +97,8 @@ func (f *FF) Subcreate(c *gin.Context) {
 	nn := time.Now().String()
 	fan.Createtime = nn[:19]
 	fan.Fatherfa = fatag
+	cff := c.PostForm("cff")
+	cff_id, _ := strconv.Atoi(cff)
 
 	var newf []models.Fangan
 	rs := data.Where("listname=?", faname).Find(&newf)
@@ -105,9 +110,42 @@ func (f *FF) Subcreate(c *gin.Context) {
 		c.Redirect(302, "/errmsg/"+msg)
 		return
 	}
-
+	if cff_id == 0 {
+		data.Create(&fan)
+		c.Redirect(302, "/")
+		return
+	}
 	data.Create(&fan)
+	var onefa models.Fangan
+	data.Where("listname=?", faname).Find(&onefa)
+	faid := onefa.Id
+	//  查询tasklist 表中的每一个铃声任务  fanganid 为 cff_id
+	var tl []models.Tasklist
+
+	data.Where("fanganid=?", cff_id).Order("starttime").Find(&tl)
+	for _, val := range tl {
+		var onetask models.Tasklist
+		onetask.Name = val.Name
+		onetask.Fanganid = faid
+		onetask.Taskid = val.Taskid
+		onetask.Jobtype = val.Jobtype
+		onetask.Jobmask = val.Jobmask
+		onetask.Duration = val.Duration
+		onetask.Starttime = val.Starttime
+		onetask.Stoptime = val.Stoptime
+		onetask.Jobdata = val.Jobdata
+		onetask.Repeatnum = val.Repeatnum
+		onetask.Playmode = val.Playmode
+		onetask.Playvol = val.Playvol
+		onetask.Medias = val.Medias
+		onetask.Terms = val.Terms
+		onetask.Areamasks = val.Areamasks
+		onetask.Groups = val.Groups
+		onetask.Poweraheadplay = val.Poweraheadplay
+		data.Create(&onetask)
+	}
 	c.Redirect(302, "/")
+
 }
 func (f *FF) Modpage(c *gin.Context) {
 	dd := time.Now().String()
