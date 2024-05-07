@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gexcel/db"
 	"gexcel/models"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -58,8 +59,14 @@ func (t *Tlist) Index(c *gin.Context) {
 
 		tl[i].Starttime = sarr[1]
 		music := val.Medias
-		marr := strings.Split(music, "\\")
-		tl[i].Medias = marr[len(marr)-1]
+		_, err := os.Stat(music)
+		if err != nil {
+			tl[i].Medias = "文件路径错误，无法读取！"
+		} else {
+			marr := strings.Split(music, "\\")
+			tl[i].Medias = marr[len(marr)-1]
+		}
+
 	}
 
 	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg, "fanganname": fa.Listname})
