@@ -61,7 +61,7 @@ func (t *Tlist) Index(c *gin.Context) {
 		music := val.Medias
 		_, err := os.Stat(music)
 		if err != nil {
-			tl[i].Medias = "文件路径错误，无法读取！"
+			tl[i].Medias = "==>>文件路径错误，无法读取！"
 		} else {
 			marr := strings.Split(music, "\\")
 			tl[i].Medias = marr[len(marr)-1]
