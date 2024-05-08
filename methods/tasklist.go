@@ -66,6 +66,19 @@ func (t *Tlist) Index(c *gin.Context) {
 			marr := strings.Split(music, "\\")
 			tl[i].Medias = marr[len(marr)-1]
 		}
+		sg := val.Groups
+		sg_arr := strings.Split(sg, ";")
+		sg_arr = sg_arr[:len(sg_arr)-1]
+		gname := ""
+
+		for _, v := range sg_arr {
+			var ggr models.Groups
+			ng := v + ";"
+			data.Where("val=?", ng).Find(&ggr)
+			gname += ggr.Groupname
+			gname += "; "
+		}
+		tl[i].Groups = gname
 
 	}
 
