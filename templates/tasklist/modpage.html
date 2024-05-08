@@ -92,7 +92,12 @@
               <div class="form-group">
                 <label for=" ">Groups(播放区域)</label><br>
                 
-                  {{.allgroups}}              
+                  {{.allgroups}}<br>
+                  {{range .groups}}                    
+                  <input type="checkbox" name="gsp[]" value="{{.Val}}" >
+                  <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                  <br>                    
+                  {{end}}                  
               </div>
               
               <!-- <div class="form-group form-check">

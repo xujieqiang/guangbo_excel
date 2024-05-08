@@ -228,8 +228,10 @@ func (t *Tlist) Modlist(c *gin.Context) {
 		data.Where("val=?", newone).Find(&gsearch)
 		allgroups = allgroups + gsearch.Groupname + ";"
 	}
+	var gp []models.Groups
+	data.Find(&gp)
 
-	c.HTML(200, "tasklist/modpage.html", gin.H{"tt": arr[0], "msg": msg, "onetask": tl, "allgroups": allgroups, "id": id})
+	c.HTML(200, "tasklist/modpage.html", gin.H{"tt": arr[0], "msg": msg, "onetask": tl, "allgroups": allgroups, "id": id, "groups": gp})
 }
 
 func (t *Tlist) Submod(c *gin.Context) {
@@ -238,6 +240,13 @@ func (t *Tlist) Submod(c *gin.Context) {
 	var tl models.Tasklist
 	data.Where("id=?", idd).Find(&tl)
 	fmt.Println(tl)
+	var g Grr
+	c.ShouldBind(&g)
+
+	gup := ""
+	for _, vv := range g.Xiaozu {
+		gup += vv
+	}
 
 	listname := c.PostForm("listname")
 	starttime := c.PostForm("starttime")
@@ -254,6 +263,7 @@ func (t *Tlist) Submod(c *gin.Context) {
 	tl.Repeatnum = rp
 	tl.Playmode = pm
 	tl.Medias = medias
+	tl.Groups = gup
 	iidd := tl.Fanganid
 	nid := strconv.Itoa(iidd)
 	data.Save(&tl)
