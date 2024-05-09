@@ -337,3 +337,10 @@ func (t *Tlist) ExportExcel(c *gin.Context) {
 	}
 	c.Redirect(302, "/tasklist/"+fid)
 }
+
+func (t *Tlist) ChangeFormat(c *gin.Context) {
+	dd := time.Now().String()
+	arr := strings.Split(dd, " ")
+
+	c.HTML(200, "tasklist/cfmat.html", gin.H{"tt": arr[0]})
+}

@@ -66,6 +66,7 @@ func Newrouter() *gin.Engine {
 		api.POST("/tasklist/subcreate/", tasklist.Subcreate)
 		api.POST("/tasklist/submod/", tasklist.Submod)
 		api.GET("/tasklist/export/:faid", tasklist.ExportExcel)
+		api.GET("/tasklist/cfmat", tasklist.ChangeFormat)
 
 		/**********************************************************
 		alltask模块部分的问题
