@@ -36,7 +36,7 @@
                     <th scope="col">Id</th>
                     <th scope="col">铃声分组名</th>
                     <th scope="col">分组的值</th>
-                     
+                    <th scope="col">终端还是分组</th> 
                     
                     <th scope="col">操作</th>
                   </tr>
@@ -47,9 +47,8 @@
                     <td scope="col">#</td>
                     <td scope="col">{{.Id}}</td>
                     <td scope="col">{{.Groupname}}</td>
-                    <td scope="col">{{.Val}}</td>
-                     
-                    
+                    <td scope="col">{{.Val}}</td>                     
+                    <td scope="col">{{if eq .Ty 1}} 终端{{else}}分组{{end}}</td>
                     <td scope="col"><a href=" /groups/mod/{{.Id}}">修改</a>  <a href="/groups/del/{{.Id}}">删除</a>
                      
                   </tr>

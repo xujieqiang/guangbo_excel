@@ -1,4 +1,4 @@
-{{ define "groups/modgroup.html"}}
+{{ define "groups/groupadd.html"}}
 
 {{template "common/header.html"}}
    
@@ -28,21 +28,21 @@
     <div class="container" style="padding-top: 20px;">
       <div class="row">
         <div class="col">
-            <form action="/groups/submod" method="post">
+            <form action="/groups/subaddgroup" method="post">
                 <input type="hidden" value="{{.onegroup.Id}}" name="id" >
                 <div class="form-group">
                   <label for=" ">铃声分组名(GroupName)</label>
-                  <input type="text" class="form-control" id="fangan" name="groupname" value="{{.onegroup.Groupname}}" required aria-describedby="emailHelp">
+                  <input type="text" class="form-control" id="fangan" name="groupname" value="" >
                   <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 <div class="form-group">
                     <label for=" ">分组的值（1;2;3;....）</label>
-                    <input type="text" class="form-control" id="fangan" name="val" required value="{{.onegroup.Val}}" aria-describedby="emailHelp">
+                    <input type="text" class="form-control" id="fangan" name="val" required value=""  >
                     <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                 </div>
                 <div class="form-group">
                   <label for=" ">分组或是终端(0是分组 1是终端）</label>
-                  <input type="text" class="form-control" id="fangan" name="ty" required value="{{.onegroup.Ty}}" aria-describedby="emailHelp">
+                  <input type="text" class="form-control" id="fangan" name="ty" required value="" >
                   <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
               </div>
                 

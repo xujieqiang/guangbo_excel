@@ -72,3 +72,22 @@ func (g *GG) Submod(c *gin.Context) {
 	data.Save(&gg)
 	c.Redirect(302, "/groups/")
 }
+
+func (g *GG) Addpage(c *gin.Context) {
+	dd := time.Now().String()
+	arr := strings.Split(dd, " ")
+	c.HTML(200, "groups/modgroup.html", gin.H{"tt": arr[0]})
+}
+
+func (g *GG) Subgroup(c *gin.Context) {
+	groupname := c.PostForm("groupname")
+	val := c.PostForm("val")
+	ty := c.PostForm("ty")
+	nty, _ := strconv.Atoi(ty)
+	var gr models.Groups
+	gr.Groupname = groupname
+	gr.Val = val
+	gr.Ty = nty
+	data.Create(&gr)
+	c.Redirect(302, "/groups")
+}

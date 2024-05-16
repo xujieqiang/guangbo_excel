@@ -30,6 +30,7 @@ type Groups struct {
 	Id        int    // id
 	Groupname string // 给那些组的数字标号取一个名字  如 初一 初二等
 	Val       string // 在广播系统中真正有意义的数字组别
+	Ty        int    //0代表的是组   1代表的是终端
 }
 
 func (g *Groups) TableName() string {

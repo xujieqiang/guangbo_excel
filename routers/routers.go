@@ -91,6 +91,8 @@ func Newrouter() *gin.Engine {
 		api.GET("/groups/mod/:id", groups.Modgroups)
 		api.GET("/groups/del/:id", groups.Delgroups)
 		api.POST("/groups/submod", groups.Submod)
+		api.GET("/groups/addpage", groups.Addpage)
+		api.POST("/groups/subaddgroup", groups.Subgroup)
 
 	}
 	return r
