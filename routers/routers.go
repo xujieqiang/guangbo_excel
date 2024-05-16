@@ -94,6 +94,8 @@ func Newrouter() *gin.Engine {
 		api.GET("/groups/addpage", groups.Addpage)
 		api.POST("/groups/subaddgroup", groups.Subgroup)
 
+		api.GET("/groups/export", groups.Exportgroup)
+
 	}
 	return r
 }

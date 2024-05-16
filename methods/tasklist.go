@@ -19,6 +19,9 @@ type Tlist struct{}
 type Grr struct {
 	Xiaozu []string `form:"gsp[]"`
 }
+type Newterms struct {
+	Zhongduan []string `form:"terms[]"`
+}
 
 func NewTlist() Tlist {
 	return Tlist{}
@@ -108,10 +111,56 @@ func (t *Tlist) Createlist(c *gin.Context) {
 	// 查找所有的铃声模板
 	var al []models.Alltask
 
-	var gp []models.Groups
-	data.Find(&gp)
+	var allgp, gp, building_one, building_two, building_three, building_others []models.Groups
+	data.Where("ty=?", 0).Find(&gp)
+	data.Find(&allgp)
+	data.Where("ty=?", 1).Where("groupname LIKE ?", "%一号楼%").Order("groupname").Find(&building_one)
+	data.Where("ty=?", 1).Where("groupname LIKE ?", "%二号楼%").Order("groupname").Find(&building_two)
+	data.Where("ty=?", 1).Where("groupname LIKE ?", "%三号楼%").Order("groupname").Find(&building_three)
+	var others []int
+	for _, vv := range allgp {
+		tag := 0
+		for _, v1 := range building_one {
+			if v1.Id == vv.Id {
+				tag = 1
+				break
+			}
+		}
+		if tag == 0 {
+			for _, v2 := range building_two {
+				if v2.Id == vv.Id {
+					tag = 1
+					break
+				}
+			}
+		}
+		if tag == 0 {
+			for _, v3 := range building_three {
+				if v3.Id == vv.Id {
+					tag = 1
+					break
+				}
+			}
+		}
+
+		if tag == 0 {
+			others = append(others, vv.Id)
+		}
+
+	}
+	data.Where("ty=?", 1).Where("id IN ?", others).Find(&building_others)
 	//data.Find(&al)
-	c.HTML(200, "tasklist/createpage.html", gin.H{"tt": arr[0], "msg": msg, "id": id, "alllings": al, "groups": gp})
+	c.HTML(200, "tasklist/createpage.html", gin.H{
+		"tt":              arr[0],
+		"msg":             msg,
+		"id":              id,
+		"alllings":        al,
+		"groups":          gp,
+		"building_one":    building_one,
+		"building_two":    building_two,
+		"building_three":  building_three,
+		"building_others": building_others,
+	})
 }
 
 func (t *Tlist) Changelb(c *gin.Context) {
@@ -144,7 +193,21 @@ func (t *Tlist) Subcreate(c *gin.Context) {
 	for _, vv := range g.Xiaozu {
 		gup += vv
 	}
-	fmt.Println("========>", gup)
+
+	var tt Newterms
+	c.ShouldBind(&tt)
+	allterms := ""
+	for _, tv := range tt.Zhongduan {
+		allterms += tv
+	}
+
+	termsarr := strings.Split(allterms, ";")
+	area_len := len(termsarr)
+	areamasks := ""
+	for i := 0; i < area_len-1; i++ {
+		areamasks += ";"
+	}
+
 	var tl models.Tasklist
 	fid, _ := strconv.Atoi(fanganid)
 	tl.Fanganid = fid
@@ -153,6 +216,7 @@ func (t *Tlist) Subcreate(c *gin.Context) {
 		c.Redirect(302, "/tasklist/createerr/"+fanganid+"/"+msg)
 		return
 	}
+
 	tl.Name = listname
 	ts, _ := strconv.Atoi(tag)
 	fmt.Println(ts)
@@ -177,6 +241,8 @@ func (t *Tlist) Subcreate(c *gin.Context) {
 	// 	return
 	// }
 	tl.Jobdata = jd
+	tl.Areamasks = areamasks
+	tl.Terms = allterms
 	rp, _ := strconv.Atoi(repeatnum)
 	if rp >= 3 {
 		msg := "repeatnum重复次数是否过多，请检查！"

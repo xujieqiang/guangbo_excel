@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 type GG struct {
@@ -95,4 +96,27 @@ func (g *GG) Subgroup(c *gin.Context) {
 	gr.Ty = nty
 	data.Create(&gr)
 	c.Redirect(302, "/groups")
+}
+
+func (g *GG) Exportgroup(c *gin.Context) {
+	var group []models.Groups
+	data.Order("ty").Find(&group)
+
+	ef := excelize.NewFile()
+	//ef.NewSheet("sheet1")
+	ef.SetCellValue("sheet1", "A1", "groupName")
+	ef.SetCellValue("sheet1", "B1", "val")
+
+	line := 2
+	for _, val := range group {
+		ef.SetCellValue("sheet1", fmt.Sprintf("A%d", line), val.Groupname)
+		ef.SetCellValue("sheet1", fmt.Sprintf("B%d", line), val.Val)
+
+		line += 1
+	}
+	err := ef.SaveAs("groups.xlsx")
+	if err != nil {
+		fmt.Println(err)
+	}
+	c.Redirect(302, "/groups/")
 }
