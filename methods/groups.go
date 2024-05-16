@@ -64,11 +64,14 @@ func (g *GG) Submod(c *gin.Context) {
 	id := c.PostForm("id")
 	groupname := c.PostForm("groupname")
 	val := c.PostForm("val")
-
+	ty := c.PostForm("ty")
+	nty, _ := strconv.Atoi(ty)
 	idd, _ := strconv.Atoi(id)
 	gg.Id = idd
 	gg.Groupname = groupname
 	gg.Val = val
+	gg.Ty = nty
+
 	data.Save(&gg)
 	c.Redirect(302, "/groups/")
 }
@@ -84,6 +87,8 @@ func (g *GG) Subgroup(c *gin.Context) {
 	val := c.PostForm("val")
 	ty := c.PostForm("ty")
 	nty, _ := strconv.Atoi(ty)
+	fmt.Println(ty)
+	fmt.Println("===>", nty)
 	var gr models.Groups
 	gr.Groupname = groupname
 	gr.Val = val

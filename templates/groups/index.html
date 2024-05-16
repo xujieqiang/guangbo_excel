@@ -57,7 +57,7 @@
                     <td scope="col">{{.Id}}</td>
                     <td scope="col">{{.Groupname}}</td>
                     <td scope="col">{{.Val}}</td>                     
-                    <td scope="col">{{if eq .Ty 1}} 终端{{else}}分组{{end}}</td>
+                    <td scope="col">{{if eq .Ty 0}} 分组{{else}}终端{{end}}</td>
                     <td scope="col"><a href=" /groups/mod/{{.Id}}">修改</a>  <a href="/groups/del/{{.Id}}">删除</a>
                      
                   </tr>
