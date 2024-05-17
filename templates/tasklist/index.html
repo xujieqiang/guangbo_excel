@@ -37,7 +37,13 @@
         <div class="col">
           <a href="/tasklist/create/{{.ww}}"><h5>增加铃声任务</h5></a>
         </div>
-        <div class="col-6"></div><div class="col"> <a href="/tasklist/export/{{.ww}}">导出到excel</a>  </div>
+        <div class="col-2"></div>
+        <div class="col">导入方案数据</div>
+        <div class="col"><form action="/tasklist/import" enctype="multipart/form-data" method="post">
+          <input type="hidden" name="faid" value="{{.ww}}" >
+          <input type="file" name="upfile" value="upload" >
+        </form></div>
+        <div class="col"> <a href="/tasklist/export/{{.ww}}">导出到excel</a>  </div>
       </div>
 
     </div>
@@ -55,7 +61,7 @@
               <th scope="col">StartTime</th>
               <!-- <th scope="col">StopTime</th> -->
               
-              <th scope="col">RepeatNum</th>
+              <!-- <th scope="col">RepeatNum</th> -->
               <!-- <th scope="col">PlayMode</th>
               <th scope="col">PlayVol</th> -->
               <th scope="col">Medias</th>
@@ -77,13 +83,16 @@
               <td scope="col">{{.Starttime}}</td>
               
               
-              <td scope="col">{{.Repeatnum}}</td>
+              
               <td scope="col"> {{.Medias  }}</td>
               <td scope="col">{{.Terms}}</td>
               
               <td scope="col">{{.Groups}}</td>
              
-              <td scope="col"><a href="/tasklist/modpage/{{$.ww}}/{{.Id}}">修改</a> <a href="/tasklist/del/{{$.ww}}/{{.Id}}"> 删除</a></td>
+              <td scope="col-2">
+                <button onclick="window.location.href='/tasklist/copy/{{$.ww}}/{{.Id}}'">复制该指令</button>
+                
+                <a href="/tasklist/modpage/{{$.ww}}/{{.Id}}">修改</a> <a href="/tasklist/del/{{$.ww}}/{{.Id}}"> 删除</a></td>
             </tr>
             {{end}}
           </tbody>

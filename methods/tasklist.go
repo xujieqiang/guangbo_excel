@@ -282,6 +282,43 @@ func (t *Tlist) Dellist(c *gin.Context) {
 	data.Delete(&tl, lid)
 	c.Redirect(302, "/tasklist/"+id)
 }
+
+func (t *Tlist) Copytask(c *gin.Context) {
+	id, e := c.Params.Get("id")
+	if !e {
+		c.Redirect(302, "/")
+		return
+	}
+	listid, e := c.Params.Get("listid")
+	if !e {
+		msg := "没有找到相应的记录！"
+		c.Redirect(302, "tasklist/delerr/"+id+"/"+msg)
+		return
+	}
+	lid, _ := strconv.Atoi(listid)
+	//idd, _ := strconv.Atoi(id)
+	var onetask, tt models.Tasklist
+	data.Where("id=?", lid).Find(&tt)
+	onetask.Fanganid = tt.Fanganid
+	onetask.Taskid = tt.Taskid
+	onetask.Name = tt.Name
+	onetask.Jobtype = tt.Jobtype
+	onetask.Jobmask = tt.Jobmask
+	onetask.Duration = tt.Duration
+	onetask.Starttime = tt.Starttime
+	onetask.Stoptime = tt.Stoptime
+	onetask.Jobdata = tt.Jobdata
+	onetask.Repeatnum = tt.Repeatnum
+	onetask.Playmode = tt.Playmode
+	onetask.Playvol = tt.Playvol
+	onetask.Medias = tt.Medias
+	onetask.Terms = tt.Terms
+	onetask.Areamasks = tt.Areamasks
+	onetask.Groups = tt.Groups
+	onetask.Poweraheadplay = tt.Poweraheadplay
+	data.Save(&onetask)
+	c.Redirect(302, "/tasklist/"+id)
+}
 func (t *Tlist) Modlist(c *gin.Context) {
 	dd := time.Now().String()
 	arr := strings.Split(dd, " ")
@@ -342,7 +379,7 @@ func (t *Tlist) Submod(c *gin.Context) {
 	tl.Repeatnum = rp
 	tl.Playmode = pm
 	tl.Medias = medias
-	tl.Groups = gup
+	//tl.Groups = gup
 	iidd := tl.Fanganid
 	nid := strconv.Itoa(iidd)
 	data.Save(&tl)
@@ -402,6 +439,12 @@ func (t *Tlist) ExportExcel(c *gin.Context) {
 		fmt.Println(err)
 	}
 	c.Redirect(302, "/tasklist/"+fid)
+}
+
+func (t *Tlist) Importdata(c *gin.Context) {
+	fanganid, _ := c.Params.Get("faid")
+	faid, _ := strconv.Atoi(fanganid)
+	fmt.Println(faid)
 }
 
 func (t *Tlist) ChangeFormat(c *gin.Context) {

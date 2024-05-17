@@ -59,6 +59,7 @@ func Newrouter() *gin.Engine {
 		api.GET("/tasklist/modpage/:id/:listid", tasklist.Modlist)
 		api.GET("/tasklist/create/:id", tasklist.Createlist)
 		api.GET("/tasklist/createerr/:id/:msg", tasklist.Createlist)
+		api.GET("/tasklist/copy/:id/:listid", tasklist.Copytask)
 
 		api.GET("/tasklist/del/:id/:listid", tasklist.Dellist)
 		api.GET("/tasklist/delerr/:id/:msg", tasklist.Index)
@@ -67,6 +68,7 @@ func Newrouter() *gin.Engine {
 		api.POST("/tasklist/submod/", tasklist.Submod)
 		api.GET("/tasklist/export/:faid", tasklist.ExportExcel)
 		api.GET("/tasklist/cfmat", tasklist.ChangeFormat)
+		api.POST("/tasklist/import/:faid", tasklist.Importdata) //faid  就是方案 的id
 
 		/**********************************************************
 		alltask模块部分的问题
