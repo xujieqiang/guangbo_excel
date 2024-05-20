@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"gexcel/db"
 	"gexcel/models"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tcolgate/mp3"
 	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 )
@@ -21,6 +23,22 @@ type Grr struct {
 }
 type Newterms struct {
 	Zhongduan []string `form:"terms[]"`
+}
+type Newtasklist struct {
+	Id       int
+	Fanganid int    // 方案id
+	Taskid   int    // 模板id
+	Name     string // 就是taskname  任务名称
+	Jobtype  int    //  1 表示每天  2 表示每周  3 表示每月  4 表示一次性任务
+
+	Starttime string // 开始时间  年-月-日  时：分：秒格式
+	Jiezhi    string // 截止时间
+
+	Groups string // 要播放的组列表
+	//Repeatnum int    // 曲子重复播放的次数
+
+	Medias string // 歌曲路径
+
 }
 
 func NewTlist() Tlist {
@@ -34,6 +52,21 @@ var (
 func init() {
 	data = db.DB
 
+}
+
+func Comparetime(faid int, t time.Time) bool {
+	var tl []models.Tasklist
+	data.Where("fanganid=?", faid).Find(&tl)
+	for _, val := range tl {
+		timeTemplate1 := "2006-01-02 15:04:05"
+		tt, _ := time.ParseInLocation(timeTemplate1, val.Starttime, time.Local) //转换成时间
+
+		if t.UnixMicro() > tt.UnixMicro() {
+			return true
+		}
+
+	}
+	return false
 }
 func (t *Tlist) Index(c *gin.Context) {
 
@@ -55,37 +88,102 @@ func (t *Tlist) Index(c *gin.Context) {
 	data.Where("id=?", iid).Find(&fa)
 	// 获取tasklist
 	var tl []models.Tasklist
+	var ntl []Newtasklist
 	data.Where("FanganId=?", iid).Order("starttime").Find(&tl)
-	for i, val := range tl {
+	for _, val := range tl {
+		var one_ntl Newtasklist
+		one_ntl.Id = val.Id
+		one_ntl.Fanganid = val.Fanganid
+		one_ntl.Taskid = val.Taskid
+		one_ntl.Name = val.Name
+		// 获取开始时间的后半部分
 		s := val.Starttime
 		sarr := strings.Split(s, " ")
 
-		tl[i].Starttime = sarr[1]
+		one_ntl.Starttime = sarr[1]
+		/////////////////////////
+		// 通过计算的来获取 终止时间
+
+		timeTemplate1 := "2006-01-02 15:04:05"
+		tt, _ := time.ParseInLocation(timeTemplate1, val.Starttime, time.Local)
+		if val.Taskid != 0 {
+			var onetask models.Alltask
+			data.Where("id=?", val.Taskid).Find(&onetask)
+			cxtime := onetask.Cxtime //int  持续时间
+			newtt := tt.Add(time.Second * time.Duration(cxtime))
+			newtstr := newtt.Format(timeTemplate1)
+			//  分段
+			stoparr := strings.Split(newtstr, " ")
+			one_ntl.Jiezhi = stoparr[1]
+		} else {
+			fm, err := os.Open(val.Medias)
+			if err != nil {
+				one_ntl.Jiezhi = ""
+
+			} else {
+				defer fm.Close()
+				d := mp3.NewDecoder(fm)
+				var frame mp3.Frame
+				skipped := 0
+				t := 0.0
+				for {
+
+					if err := d.Decode(&frame, &skipped); err != nil {
+						if err == io.EOF {
+							break
+						}
+						fmt.Println(err)
+						return
+					}
+
+					t = t + frame.Duration().Seconds()
+				}
+				cxtime := int(t)
+				newtt := tt.Add(time.Second * time.Duration(cxtime))
+				newtstr := newtt.Format(timeTemplate1)
+				//  分段
+				stoparr := strings.Split(newtstr, " ")
+				one_ntl.Jiezhi = stoparr[1]
+			}
+		}
+
+		//读取路径  判断是否存在文件
 		music := val.Medias
 		_, err := os.Stat(music)
 		if err != nil {
-			tl[i].Medias = "==>>文件路径错误，无法读取！"
+			one_ntl.Medias = "==>>文件路径错误，无法读取！"
 		} else {
 			marr := strings.Split(music, "\\")
-			tl[i].Medias = marr[len(marr)-1]
+			one_ntl.Medias = marr[len(marr)-1]
 		}
+		////////////////////////////////////////
+		///读取分组 显示分组名称
 		sg := val.Groups
 		sg_arr := strings.Split(sg, ";")
 		sg_arr = sg_arr[:len(sg_arr)-1]
+
 		gname := ""
 
 		for _, v := range sg_arr {
 			var ggr models.Groups
 			ng := v + ";"
-			data.Where("val=?", ng).Find(&ggr)
+			data.Where("val=?", ng).Where("ty=?", 0).Find(&ggr)
 			gname += ggr.Groupname
 			gname += "; "
 		}
-		tl[i].Groups = gname
+		one_ntl.Groups = gname
+		////////////////////////////////////////////
+		ntl = append(ntl, one_ntl)
 
 	}
 
-	c.HTML(200, "tasklist/index.html", gin.H{"tt": arr[0], "tasklist": tl, "ww": id, "msg": msg, "fanganname": fa.Listname})
+	c.HTML(200, "tasklist/index.html", gin.H{
+		"tt":         arr[0],
+		"tasklist":   ntl,
+		"ww":         id,
+		"msg":        msg,
+		"fanganname": fa.Listname,
+	})
 }
 
 // func (t *Tlist) Modlist(c *gin.Context) {
@@ -110,56 +208,56 @@ func (t *Tlist) Createlist(c *gin.Context) {
 	id, _ := c.Params.Get("id")
 	// 查找所有的铃声模板
 	var al []models.Alltask
-
-	var allgp, gp, building_one, building_two, building_three, building_others []models.Groups
+	//, building_one, building_two, building_three, building_others
+	var allgp, gp []models.Groups
 	data.Where("ty=?", 0).Find(&gp)
 	data.Find(&allgp)
-	data.Where("ty=?", 1).Where("groupname LIKE ?", "%一号楼%").Order("groupname").Find(&building_one)
-	data.Where("ty=?", 1).Where("groupname LIKE ?", "%二号楼%").Order("groupname").Find(&building_two)
-	data.Where("ty=?", 1).Where("groupname LIKE ?", "%三号楼%").Order("groupname").Find(&building_three)
-	var others []int
-	for _, vv := range allgp {
-		tag := 0
-		for _, v1 := range building_one {
-			if v1.Id == vv.Id {
-				tag = 1
-				break
-			}
-		}
-		if tag == 0 {
-			for _, v2 := range building_two {
-				if v2.Id == vv.Id {
-					tag = 1
-					break
-				}
-			}
-		}
-		if tag == 0 {
-			for _, v3 := range building_three {
-				if v3.Id == vv.Id {
-					tag = 1
-					break
-				}
-			}
-		}
+	// data.Where("ty=?", 1).Where("groupname LIKE ?", "%一号楼%").Order("groupname").Find(&building_one)
+	// data.Where("ty=?", 1).Where("groupname LIKE ?", "%二号楼%").Order("groupname").Find(&building_two)
+	// data.Where("ty=?", 1).Where("groupname LIKE ?", "%三号楼%").Order("groupname").Find(&building_three)
+	// var others []int
+	// for _, vv := range allgp {
+	// 	tag := 0
+	// 	for _, v1 := range building_one {
+	// 		if v1.Id == vv.Id {
+	// 			tag = 1
+	// 			break
+	// 		}
+	// 	}
+	// 	if tag == 0 {
+	// 		for _, v2 := range building_two {
+	// 			if v2.Id == vv.Id {
+	// 				tag = 1
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// 	if tag == 0 {
+	// 		for _, v3 := range building_three {
+	// 			if v3.Id == vv.Id {
+	// 				tag = 1
+	// 				break
+	// 			}
+	// 		}
+	// 	}
 
-		if tag == 0 {
-			others = append(others, vv.Id)
-		}
+	// 	if tag == 0 {
+	// 		others = append(others, vv.Id)
+	// 	}
 
-	}
-	data.Where("ty=?", 1).Where("id IN ?", others).Find(&building_others)
+	// }
+	// data.Where("ty=?", 1).Where("id IN ?", others).Find(&building_others)
 	//data.Find(&al)
 	c.HTML(200, "tasklist/createpage.html", gin.H{
-		"tt":              arr[0],
-		"msg":             msg,
-		"id":              id,
-		"alllings":        al,
-		"groups":          gp,
-		"building_one":    building_one,
-		"building_two":    building_two,
-		"building_three":  building_three,
-		"building_others": building_others,
+		"tt":       arr[0],
+		"msg":      msg,
+		"id":       id,
+		"alllings": al,
+		"groups":   gp,
+		// "building_one":    building_one,
+		// "building_two":    building_two,
+		// "building_three":  building_three,
+		// "building_others": building_others,
 	})
 }
 
@@ -194,19 +292,19 @@ func (t *Tlist) Subcreate(c *gin.Context) {
 		gup += vv
 	}
 
-	var tt Newterms
-	c.ShouldBind(&tt)
-	allterms := ""
-	for _, tv := range tt.Zhongduan {
-		allterms += tv
-	}
+	// var tt Newterms
+	// c.ShouldBind(&tt)
+	// allterms := ""
+	// for _, tv := range tt.Zhongduan {
+	// 	allterms += tv
+	// }
 
-	termsarr := strings.Split(allterms, ";")
-	area_len := len(termsarr)
-	areamasks := ""
-	for i := 0; i < area_len-1; i++ {
-		areamasks += ";"
-	}
+	// termsarr := strings.Split(allterms, ";")
+	// area_len := len(termsarr)
+	// areamasks := ""
+	// for i := 0; i < area_len-1; i++ {
+	// 	areamasks += ";"
+	// }
 
 	var tl models.Tasklist
 	fid, _ := strconv.Atoi(fanganid)
@@ -241,8 +339,8 @@ func (t *Tlist) Subcreate(c *gin.Context) {
 	// 	return
 	// }
 	tl.Jobdata = jd
-	tl.Areamasks = areamasks
-	tl.Terms = allterms
+	// tl.Areamasks = areamasks
+	// tl.Terms = allterms
 	rp, _ := strconv.Atoi(repeatnum)
 	if rp >= 3 {
 		msg := "repeatnum重复次数是否过多，请检查！"
@@ -345,9 +443,16 @@ func (t *Tlist) Modlist(c *gin.Context) {
 		allgroups = allgroups + gsearch.Groupname + ";"
 	}
 	var gp []models.Groups
-	data.Find(&gp)
+	data.Where("ty=?", 0).Find(&gp)
 
-	c.HTML(200, "tasklist/modpage.html", gin.H{"tt": arr[0], "msg": msg, "onetask": tl, "allgroups": allgroups, "id": id, "groups": gp})
+	c.HTML(200, "tasklist/modpage.html", gin.H{
+		"tt":        arr[0],
+		"msg":       msg,
+		"onetask":   tl,
+		"allgroups": allgroups,
+		"id":        id,
+		"groups":    gp,
+	})
 }
 
 func (t *Tlist) Submod(c *gin.Context) {
@@ -379,7 +484,9 @@ func (t *Tlist) Submod(c *gin.Context) {
 	tl.Repeatnum = rp
 	tl.Playmode = pm
 	tl.Medias = medias
-	//tl.Groups = gup
+	tl.Groups = gup
+	tl.Areamasks = ""
+	tl.Terms = ""
 	iidd := tl.Fanganid
 	nid := strconv.Itoa(iidd)
 	data.Save(&tl)

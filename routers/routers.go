@@ -1,17 +1,39 @@
 package routers
 
 import (
+	"fmt"
 	"gexcel/methods"
 	"net/http"
+	"strconv"
+	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
+
+func Displaytime(t int) string {
+	if t < 60 {
+		return strconv.Itoa(t) + "秒"
+	}
+	d := t / 60
+	s := t % 60
+	rs := ""
+	if s != 0 {
+		rs = fmt.Sprintf(strconv.Itoa(d) + "分" + strconv.Itoa(s) + "秒")
+	} else {
+		rs = fmt.Sprintf(strconv.Itoa(d) + "分")
+	}
+
+	return rs
+}
 
 func Newrouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.SetFuncMap(template.FuncMap{
+		"displayt": Displaytime,
+	})
 	r.LoadHTMLGlob("templates/**/*")
 	r.StaticFS("/static", http.Dir("./static"))
 
@@ -82,7 +104,7 @@ func Newrouter() *gin.Engine {
 		api.GET("/alltask/deltask/:id", alltask.Deltask)
 		api.GET("/alltask/modtask/:id", alltask.Modtask)
 		api.POST("/alltask/submod", alltask.Submod)
-
+		api.GET("/alltask/reftime", alltask.Refreshtime)
 		/**********************************************************
 		groups模块部分的问题
 

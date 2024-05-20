@@ -50,49 +50,54 @@
     <div class="container" style="padding-top: 20px;">
       <div class="row">
         <div class="col-12">
-            <table class="table">
-          <thead>
+            <table class="table table-striped">
+          <thead class="thead-dark">
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Name</th>
+              <th scope="col-1">选择</th>
+              
+              <th scope="col-1">Name</th>
               <!-- <th scope="col">JobType</th> -->
               <!-- <th scope="col">JobMask</th>
               <th scope="col">Duration</th> -->
-              <th scope="col">StartTime</th>
+              <th scope="col-1">StartTime</th>
+              <th scope="col-1">Stoptime</th>
               <!-- <th scope="col">StopTime</th> -->
               
               <!-- <th scope="col">RepeatNum</th> -->
               <!-- <th scope="col">PlayMode</th>
               <th scope="col">PlayVol</th> -->
-              <th scope="col">Medias</th>
-              <th scope="col">Terms</th>
+              <th scope="col-2">Medias</th>
+              
               <!-- <th scope="col">AreaMasks</th> -->
-              <th scope="col">播放区域(groups)</th>
+              <th scope="col-3">播放区域(groups)</th>
               <!-- <th scope="col">PowerAheadPlay</th> -->
-              <th scope="col">操作</th>
+              <th scope="col-3">操作</th>
             </tr>
           </thead>
           <tbody>
             
             {{range .tasklist}}
             <tr>
-              <td scope="col">#</td>
-              <td scope="col">{{.Name}}</td>
+              <td style="vertical-align: middle;"><input type="checkbox" name="seltask[]" value="{{.Id}}"></td>
+              
+              <td style="vertical-align: middle;">{{.Name}}</td>
               
               
-              <td scope="col">{{.Starttime}}</td>
+              <td style="vertical-align: middle;">{{.Starttime}}</td>
+              <td style="vertical-align: middle;">{{.Jiezhi}}</td>
               
               
               
-              <td scope="col"> {{.Medias  }}</td>
-              <td scope="col">{{.Terms}}</td>
-              
-              <td scope="col">{{.Groups}}</td>
+              <td style="vertical-align: middle;"> {{.Medias  }}</td>
              
-              <td scope="col-2">
-                <button onclick="window.location.href='/tasklist/copy/{{$.ww}}/{{.Id}}'">复制该指令</button>
-                
-                <a href="/tasklist/modpage/{{$.ww}}/{{.Id}}">修改</a> <a href="/tasklist/del/{{$.ww}}/{{.Id}}"> 删除</a></td>
+              
+              <td style="vertical-align: middle;">{{.Groups}}</td>
+             
+              <td style="vertical-align: middle;">
+                <button class="btn btn-outline-primary" onclick="window.location.href='/tasklist/copy/{{$.ww}}/{{.Id}}'">复制</button><br>
+                <button class="btn btn-outline-primary"  onclick="window.location.href='/tasklist/modpage/{{$.ww}}/{{.Id}}'">修改</button>               <br>
+                <button class="btn btn-outline-primary"  onclick="window.location.href='/tasklist/del/{{$.ww}}/{{.Id}}'">删除</button>
+                 
             </tr>
             {{end}}
           </tbody>
@@ -101,6 +106,7 @@
         
       </div>
     </div>
+    
     {{template "common/footbar.html"}}
 </body>
 </html>

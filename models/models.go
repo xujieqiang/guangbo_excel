@@ -6,6 +6,7 @@ type Alltask struct {
 	Jobtype  int    // 1 表示每天  2 表示每周  3 表示每月  4 表示一次性任务
 	Jobmask  int    // 是否有终止日期 0表示没有 1表示有
 	Medias   string // 音频路径
+	Cxtime   int    // 音频持续时间，以秒计算
 	Tag      int    // 1 表示日常任务， 0表示特殊 或者 不寻常任务。 2 中考铃声任务
 }
 

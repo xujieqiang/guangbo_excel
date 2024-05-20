@@ -1,0 +1,72 @@
+<div class="form-group">
+                  <label for=" ">Terms终端(播放区域)</label><br>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        一号楼终端
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        {{range .building_one}}                    
+                        <input type="checkbox" name="terms[]" value="{{.Val}}" >
+                        <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                        <br>                    
+                        {{end}}
+                      </div>
+                    </div> 
+                  </div>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        二号楼终端
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        {{range .building_two}}                    
+                        <input type="checkbox" name="terms[]" value="{{.Val}}" >
+                        <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                        <br>                    
+                        {{end}} 
+                      </div>
+                    </div> 
+                  </div>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        三号楼终端
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        
+                        {{range .building_three}}  
+                                         
+                        <input type="checkbox" name="terms[]" value="{{.Val}}" >
+                        <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                        <br>                    
+                        {{end}}
+                      </div>
+                    </div> 
+                  </div>
+                  <div class="container">
+                    <div class="row">
+                      <div class="col">
+                        其他楼终端
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">   
+                        {{range .building_others}}                    
+                        <input type="checkbox" name="terms[]" value="{{.Val}}" >
+                        <font style="font-size: 3;color: rgb(77, 101, 196);">{{.Groupname}}</font>
+                        <br>                    
+                        {{end}}
+                      </div>
+                    </div> 
+                  </div>
+                   
+                     
+                                         
+                </div>

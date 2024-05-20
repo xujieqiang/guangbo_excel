@@ -23,7 +23,7 @@ func (g *GG) Index(c *gin.Context) {
 	dd := time.Now().String()
 	arr := strings.Split(dd, " ")
 	var gl []models.Groups
-	data.Find(&gl)
+	data.Where("ty=?", 0).Find(&gl)
 
 	c.HTML(200, "groups/index.html", gin.H{"tt": arr[0], "groups": gl})
 }

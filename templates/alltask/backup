@@ -1,0 +1,27 @@
+music := "D:\\系统铃声\\英语听力\\中考训练\\英语听力前奏.mp3"
+f, err := os.Open(music)
+if err != nil {
+	fmt.Println(err)
+	return
+
+}
+
+defer f.Close()
+
+d := mp3.NewDecoder(f)
+var frame mp3.Frame
+skipped := 0
+t := 0.0
+for {
+
+	if err := d.Decode(&frame, &skipped); err != nil {
+		if err == io.EOF {
+			break
+		}
+		fmt.Println(err)
+		return
+	}
+
+	t = t + frame.Duration().Seconds()
+}
+allt := fmt.Sprintf("%.0f", t)

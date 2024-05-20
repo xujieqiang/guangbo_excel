@@ -3,12 +3,14 @@ package methods
 import (
 	"fmt"
 	"gexcel/models"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tcolgate/mp3"
 )
 
 type Alllings struct{}
@@ -52,7 +54,51 @@ func (a *Alllings) Index(c *gin.Context) {
 			kaoshi[i].Medias = "==>>路径错误，无法读取！"
 		}
 	}
-	c.HTML(200, "alltask/index.html", gin.H{"tt": arr[0], "alllings": al, "spe": sal, "kaoshi": kaoshi})
+
+	c.HTML(200, "alltask/index.html", gin.H{
+		"tt":       arr[0],
+		"alllings": al,
+		"spe":      sal,
+		"kaoshi":   kaoshi,
+	})
+}
+
+func (a *Alllings) Refreshtime(c *gin.Context) {
+	var aat []models.Alltask
+	data.Find(&aat)
+	for _, val := range aat {
+		//var onetask models.Alltask
+		music_path := val.Medias
+		f, err := os.Open(music_path)
+		if err != nil {
+			c.Redirect(302, "/alltask")
+			return
+		}
+
+		defer f.Close()
+
+		d := mp3.NewDecoder(f)
+		var frame mp3.Frame
+		skipped := 0
+		t := 0.0
+		for {
+
+			if err := d.Decode(&frame, &skipped); err != nil {
+				if err == io.EOF {
+					break
+				}
+				fmt.Println(err)
+				return
+			}
+
+			t = t + frame.Duration().Seconds()
+		}
+		cxtime := int(t)
+		val.Cxtime = cxtime
+		data.Save(&val)
+	}
+	c.Redirect(302, "/alltask/")
+
 }
 
 func (a *Alllings) Newling(c *gin.Context) {
