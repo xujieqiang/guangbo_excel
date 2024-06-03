@@ -541,7 +541,8 @@ func (t *Tlist) ExportExcel(c *gin.Context) {
 		ef.SetCellValue(fname, fmt.Sprintf("O%d", line), val.Poweraheadplay)
 		line += 1
 	}
-	err := ef.SaveAs("data.xlsx")
+	exfile := fname + ".xlsx"
+	err := ef.SaveAs(exfile)
 	if err != nil {
 		fmt.Println(err)
 	}
